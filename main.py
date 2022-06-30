@@ -302,23 +302,6 @@ class DrawerList(ThemableBehavior, MDList):
 class Tab(MDFloatLayout, MDTabsBase):
     '''Class implementing content for a tab.'''
 
-def next_month_date(d):
-    _year = d.year + (d.month // 12)
-    _month = 1 if (d.month // 12) else d.month + 1
-    next_month_len = calendar.monthrange(_year, _month)[1]
-    next_month = d
-    if d.day > next_month_len:
-        next_month = next_month.replace(day=next_month_len)
-    next_month = next_month.replace(year=_year, month=_month)
-    return next_month
-
-
-def show_canvas_stress(wid):
-    with wid.canvas:
-        for x in range(10):
-            Color(r(), 1, 1, mode='hsv')
-            Rectangle(pos=(r() * wid.width + wid.x, r() * wid.height + wid.y), size=(20, 20))
-
 class MortgageCalculator(MDApp):
     title = "MortgageCalculator"
     by_who = "Demyan Shvetsov"
@@ -337,7 +320,7 @@ class MortgageCalculator(MDApp):
         self.data_for_calc_is_changed = True
 
         self.screen = Builder.load_string(KV)
-        
+
         menu_items = [{"icon": "format-text-rotation-angle-up", "text": 'annuity'},
                       {"icon": "format-text-rotation-angle-down", "text": 'differentiated'}]
         self.menu = MDDropdownMenu(
@@ -347,8 +330,6 @@ class MortgageCalculator(MDApp):
             width_mult=4,
         )
         self.menu.bind(on_release=self.set_item)
-
-        # https://kivymd.readthedocs.io/en/latest/components/pickers/?highlight=date%20picker#
 
         self.screen.ids.loan.bind(
             on_touch_down=self.validate_on_nums_input,
@@ -365,7 +346,6 @@ class MortgageCalculator(MDApp):
             focus=self.on_focus,
         )
 
-    #https://kivymd.readthedocs.io/en/latest/components/menu/?highlight=MDDropdownMenu#create-submenu
     def update_menu(self):
         self.menu = None
         menu_items = [{"icon": "format-text-rotation-angle-up", "text": 'annuity'},
@@ -403,16 +383,18 @@ class MortgageCalculator(MDApp):
                 self.screen.ids.months.helper_text = ""
                 if len(self.screen.ids.months.text) > 4:
                     self.screen.ids.months.text = self.screen.ids.months.text[0:4]
-                if int(self.screen.ids.months.text) > 1200:
-                    self.screen.ids.months.text = "1200"
+                if self.screen.ids.months.text.isnumeric():
+                    if int(self.screen.ids.months.text) > 1200:
+                        self.screen.ids.months.text = "1200"
                 self.calc_1st_screen()
                 self.data_for_calc_is_changed = True
             elif instance.name == 'interest':
                 self.screen.ids.interest.helper_text = ""
                 if len(self.screen.ids.interest.text) > 4:
                     self.screen.ids.interest.text = self.screen.ids.interest.text[0:4]
-                if float(self.screen.ids.interest.text) > 1000:
-                    self.screen.ids.interest.text = "1000"
+                if self.screen.ids.interest.text.isnumeric():
+                    if float(self.screen.ids.interest.text) > 1000:
+                        self.screen.ids.interest.text = "1000"
                 self.calc_1st_screen()
                 self.data_for_calc_is_changed = True
 
@@ -453,23 +435,36 @@ class MortgageCalculator(MDApp):
         return self.screen
 
     def calc_1st_screen(self):
-        if float(self.screen.ids.loan.text) < 1:
+        if self.screen.ids.loan.text.isnumeric():
+            if float(self.screen.ids.loan.text) > 1:
+                loan = float(self.screen.ids.loan.text)
+            else:
+                loan = 1.0
+                self.screen.ids.loan.text = '1'
+        else:
             loan = 1.0
             self.screen.ids.loan.text = '1'
-        else:
-            loan = float(self.screen.ids.loan.text)
 
-        if int(self.screen.ids.months.text) < 1:
+        if self.screen.ids.months.text.isnumeric():
+            if int(self.screen.ids.months.text) > 1:
+                months = int(self.screen.ids.months.text)
+            else:
+                months = 1
+                self.screen.ids.months.text = '1'
+        else:
             months = 1
             self.screen.ids.months.text = '1'
+
+        if self.screen.ids.interest.text.isnumeric():
+            if (float(self.screen.ids.interest.text) > 1) :
+                interest = float(self.screen.ids.interest.text)
+            else:
+                interest = 1.0
+                self.screen.ids.interest.text = '1'
         else:
-            months = int(self.screen.ids.months.text)
-        
-        if float(self.screen.ids.interest.text) < 1:
             interest = 1
             self.screen.ids.interest.text = '1'
-        else:
-            interest = float(self.screen.ids.interest.text)
+
         percent = interest / 100 / 12
 
         if self.payment_annuity:
