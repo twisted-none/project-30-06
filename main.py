@@ -1,4 +1,5 @@
 from kivy.lang import Builder
+import datetime
 from kivy.uix.boxlayout import BoxLayout
 from kivy.properties import StringProperty, ListProperty
 
@@ -40,13 +41,13 @@ KV = '''
             source: "data/logo/kivy-icon-256.png"
 
     MDLabel:
-        text: "Morgate Calcurator"
+        text: app.title
         font_style: "Button"
         size_hint_y: None
         height: self.texture_size[1]
 
     MDLabel:
-        text: "Калькулятор Ипотеки"
+        text: app.by_who
         font_style: "Caption"
         size_hint_y: None
         height: self.texture_size[1]
@@ -70,13 +71,17 @@ Screen:
                     orientation: 'vertical'
 
                     MDToolbar:
-                        title: "Morgate Calculator"
+                        title: app.title
                         elevation: 10
                         left_action_items: [['menu', lambda x: nav_drawer.set_state("open")]]
+                        md_bg_color: 0, 0, 0, 1
 
                     MDTabs:
                         id: tabs
-
+                        on_tab_switch: app.on_tab_switch(*args)
+                        height: "48dp"
+                        tab_indicator_anim: False
+                        background_color: 0.1, 0.1, 0.1, 1
 
         MDNavigationDrawer:
             id: nav_drawer
@@ -110,28 +115,69 @@ class DrawerList(ThemableBehavior, MDList):
 
 
 class MorgateCalculator(MDApp):
+    title = "Morgate Calculator"
+    by_who = "author Demyan Shvetsov"
+
     def build(self):
         return Builder.load_string(KV)
 
     def on_start(self):
-        icons_item = {
-            "folder": "My files",
-            "account-multiple": "Shared with me",
-            "star": "Starred",
-            "history": "Recent",
-            "checkbox-marked": "Shared with me",
-            "upload": "Upload",
+#        self.screen.ids.start_date.text = datetime.date.today().strftime("%d-%m-%Y")
+#        self.screen.ids.loan.text = "50000"
+#        self.screen.ids.months.text = "12"
+#        self.screen.ids.interest.text = "22"
+#        self.screen.ids.payment_type.text = "annuity"
+
+#        self.calc_1st_screen()
+        icons_item_menu_lines = {
+            "account-cowboy-hat": "About author",
+            "github": "Source code",
+            "share-variant": "Share app",  # air-horn
+            "shield-sun": "Dark/Light",
         }
-        for icon_name in icons_item.keys():
+        icons_item_menu_tabs = {
+            "calculator-variant": "Input",  # ab-testing
+            "table-large": "Table",
+            "chart-areaspline": "Graph",
+            "chart-pie": "Chart",  # chart-arc
+            "book-open-variant": "Sum",
+        }
+        for icon_name in icons_item_menu_lines.keys():
             self.root.ids.content_drawer.ids.md_list.add_widget(
-                ItemDrawer(icon=icon_name, text=icons_item[icon_name])
+                ItemDrawer(icon=icon_name, text=icons_item_menu_lines[icon_name])
             )
-        for icon_name, name_tab in icons_item.items():
-            self.root.ids.tabs.add_widget(
-                Tab(
-                    text=f"[ref={name_tab}][font={fonts[-1]['fn_regular']}]{md_icons[icon_name]}[/font][/ref]  {name_tab}"
-                )
-            )
+
+        for icon_name, name_tab in icons_item_menu_tabs.items():
+             self.root.ids.tabs.add_widget(
+                 Tab(
+                     text=f"[size=20][font={fonts[-1]['fn_regular']}]{md_icons[icon_name]}[/size][/font] {name_tab}"
+                 )
+             )
+
+        # for tab_act in self.root.ids.tabs.get_tab_list():
+        #     print(tab_act.text)
+        #     if tab_act.text.find("Active") != -1:
+        #         tab_act.text = "* ACTIVE *"
+        #         # tab_act.add_widget(
+        #         #     MDLabel(
+        #         #         text="TEST OK!",
+        #         #         halign="right",
+        #         #     )
+        #         # )
+
+        # print(self.root.ids.tabs.get_tab_list())
+
+        pass
+    def on_tab_switch(
+        self, instance_tabs, instance_tab, instance_tab_label, tab_text
+    ):
+        '''Called when switching tabs.
+
+        :type instance_tabs: <kivymd.uix.tab.MDTabs object>;
+        :param instance_tab: <__main__.Tab object>;
+        :param instance_tab_label: <kivymd.uix.tab.MDTabsLabel object>;
+        :param tab_text: text or name icon of tab;
+        '''
 
 
 MorgateCalculator().run()
