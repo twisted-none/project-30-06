@@ -346,22 +346,6 @@ class MortgageCalculator(MDApp):
             focus=self.on_focus,
         )
 
-    def update_menu(self):
-        self.menu = None
-        menu_items = [{"icon": "format-text-rotation-angle-up", "text": 'annuity'},
-                      {"icon": "format-text-rotation-angle-down", "text": 'differentiated'}]
-        self.menu = MDDropdownMenu(
-            caller=self.screen.ids.payment_type,
-            items=menu_items,
-            position="auto",
-            width_mult=4,
-        )
-        self.menu.bind(on_release=self.set_item)
-        if self.payment_annuity:
-            self.screen.ids.payment_type.text = 'annuity'
-        else:
-            self.screen.ids.payment_type.text = 'differentiated'
-
     def on_focus(self, instance, value):
         if value:
             print('User focused', instance.name, instance.text)
@@ -418,17 +402,6 @@ class MortgageCalculator(MDApp):
                 self.data_for_calc_is_changed = True
 
         Clock.schedule_once(set_item, 0.5)
-
-    def get_date(self, date):
-        '''
-        :type date: <class 'datetime.date'>
-        '''
-        pre_start_date = datetime.datetime.strptime(self.screen.ids.start_date.text, "%d-%m-%Y").date()
-        print("Before: ", date, self.data_for_calc_is_changed, pre_start_date == date)
-        self.screen.ids.start_date.text = date.strftime("%d-%m-%Y")  # str(date)
-        if (pre_start_date != date):
-            self.data_for_calc_is_changed = True
-        print("After: ", date, self.data_for_calc_is_changed, pre_start_date == date)
 
     def build(self):
         self.theme_cls.theme_style = "Light"
