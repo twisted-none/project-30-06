@@ -302,10 +302,6 @@ class DrawerList(ThemableBehavior, MDList):
 class Tab(MDFloatLayout, MDTabsBase):
     '''Class implementing content for a tab.'''
 
-
-class ContentDialogSend(BoxLayout):
-    pass
-
 def next_month_date(d):
     _year = d.year + (d.month // 12)
     _month = 1 if (d.month // 12) else d.month + 1
@@ -322,50 +318,6 @@ def show_canvas_stress(wid):
         for x in range(10):
             Color(r(), 1, 1, mode='hsv')
             Rectangle(pos=(r() * wid.width + wid.x, r() * wid.height + wid.y), size=(20, 20))
-
-
-def draw_graph(wid, start_date, loan, months, interest, payment_type):
-    with wid.canvas:
-        Color(.2, .2, .2, 1)
-        Line(rectangle=(wid.x, wid.y, wid.width, wid.height), width=1)
-    graph_height = wid.height
-    delta_width = wid.width / months
-
-    percent = interest / 100 / 12
-    monthly_payment = loan * (percent + percent / ((1 + percent) ** months - 1))
-
-    debt_end_month = loan
-    for i in range(0, months):
-        repayment_of_interest = debt_end_month * percent
-        repayment_of_loan_body = monthly_payment - repayment_of_interest
-        debt_end_month = debt_end_month - repayment_of_loan_body
-        delta_height_interest = int(repayment_of_interest * graph_height / monthly_payment)
-        delta_height_loan = int(repayment_of_loan_body * graph_height / monthly_payment)
-        with wid.canvas:
-            Color(1, 0, 0, 1)
-            Rectangle(pos=(wid.x + int(i * delta_width), wid.y), size=(int(delta_width), delta_height_loan))
-            Color(0, 0, 1, 1)
-            Rectangle(pos=(wid.x + int(i * delta_width), wid.y + delta_height_loan),
-                      size=(int(delta_width), delta_height_interest))
-
-
-def draw_chart(wid, total_amount_of_payments, loan):
-    interest_chart = ((total_amount_of_payments - loan) * 360) / total_amount_of_payments
-    circle_width = wid.width
-    center_x = 0
-    center_y = wid.height // 2 - circle_width // 2
-    if (wid.width > wid.height):
-        circle_width = wid.height
-        center_x = wid.width // 2 - circle_width // 2
-        center_y = 0
-    # print(wid.x, wid.y)
-    with wid.canvas:
-        Color(0, 0, 1, 1)
-        Ellipse(pos=(wid.x + center_x, wid.y + center_y), size=(circle_width, circle_width),
-                angle_start=360 - int(interest_chart), angle_end=360)
-        Color(1, 0, 0, 1)
-        Ellipse(pos=(wid.x + center_x, wid.y + center_y), size=(circle_width, circle_width), angle_start=0,
-                angle_end=360 - int(interest_chart))
 
 class MortgageCalculator(MDApp):
     title = "MortgageCalculator"
@@ -385,8 +337,7 @@ class MortgageCalculator(MDApp):
         self.data_for_calc_is_changed = True
 
         self.screen = Builder.load_string(KV)
-        # https://kivymd.readthedocs.io/en/latest/components/menu/?highlight=MDDropDownItem#center-position
-        # menu_items = [{"icon": "git", "text": f"Item {i}"} for i in range(5)]
+        
         menu_items = [{"icon": "format-text-rotation-angle-up", "text": 'annuity'},
                       {"icon": "format-text-rotation-angle-down", "text": 'differentiated'}]
         self.menu = MDDropdownMenu(
@@ -498,10 +449,7 @@ class MortgageCalculator(MDApp):
         print("After: ", date, self.data_for_calc_is_changed, pre_start_date == date)
 
     def build(self):
-        # self.theme_cls.primary_palette = "Brown"
-        # self.theme_cls.primary_hue = "A100"
-        self.theme_cls.theme_style = "Light"  # "Dark"  # "Light"
-        # return Builder.load_string(KV)
+        self.theme_cls.theme_style = "Light"
         return self.screen
 
     def calc_1st_screen(self):
