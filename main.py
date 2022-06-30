@@ -292,7 +292,6 @@ class DrawerList(ThemableBehavior, MDList):
     def set_color_item(self, instance_item):
         """Called when tap on a menu item."""
 
-        # Set the color of the icon and text for the menu item.
         for item in self.children:
             if item.text_color == self.theme_cls.primary_color:
                 item.text_color = self.theme_cls.text_color
@@ -307,8 +306,6 @@ class Tab(MDFloatLayout, MDTabsBase):
 class ContentDialogSend(BoxLayout):
     pass
 
-
-# https://stackoverflow.com/questions/2249956/how-to-get-the-same-day-of-next-month-of-a-given-day-in-python-using-datetime
 def next_month_date(d):
     _year = d.year + (d.month // 12)
     _month = 1 if (d.month // 12) else d.month + 1
@@ -320,7 +317,6 @@ def next_month_date(d):
     return next_month
 
 
-# https://kivy.org/doc/stable/examples/gen__canvas__canvas_stress__py.html
 def show_canvas_stress(wid):
     with wid.canvas:
         for x in range(10):
@@ -329,7 +325,6 @@ def show_canvas_stress(wid):
 
 
 def draw_graph(wid, start_date, loan, months, interest, payment_type):
-    # print(wid.x, wid.y)
     with wid.canvas:
         Color(.2, .2, .2, 1)
         Line(rectangle=(wid.x, wid.y, wid.width, wid.height), width=1)
@@ -346,8 +341,6 @@ def draw_graph(wid, start_date, loan, months, interest, payment_type):
         debt_end_month = debt_end_month - repayment_of_loan_body
         delta_height_interest = int(repayment_of_interest * graph_height / monthly_payment)
         delta_height_loan = int(repayment_of_loan_body * graph_height / monthly_payment)
-        # print("####: ", delta_height_loan, delta_height_loan)
-        # print(monthly_payment, repayment_of_interest, repayment_of_loan_body, debt_end_month)
         with wid.canvas:
             Color(1, 0, 0, 1)
             Rectangle(pos=(wid.x + int(i * delta_width), wid.y), size=(int(delta_width), delta_height_loan))
@@ -373,14 +366,6 @@ def draw_chart(wid, total_amount_of_payments, loan):
         Color(1, 0, 0, 1)
         Ellipse(pos=(wid.x + center_x, wid.y + center_y), size=(circle_width, circle_width), angle_start=0,
                 angle_end=360 - int(interest_chart))
-
-
-# https://pypi.org/project/kivy-ios/
-# https://github.com/kivy/kivy-ios/issues/411
-# -----------------
-# https://stackoverflow.com/questions/38983649/kivy-android-share-image
-# https://stackoverflow.com/questions/63322944/how-to-use-share-button-to-share-content-of-my-app
-# Native method for Android.
 
 class MortgageCalculator(MDApp):
     title = "MortgageCalculator"
@@ -567,20 +552,16 @@ class MortgageCalculator(MDApp):
         #self.screen.ids.payment_type.text = "annuity"
 
         self.calc_1st_screen()
-        # icons names you can get here: https://materialdesignicons.com/
         icons_item_menu_lines = {
             "account-cowboy-hat": "About author",
-            "youtube": "My YouTube",
-            "coffee": "Donate author",
             "github": "Source code",
-            "share-variant": "Share app",  # air-horn
             "shield-sun": "Dark/Light",
         }
         icons_item_menu_tabs = {
-            "calculator-variant": "Input",  # ab-testing
+            "calculator-variant": "Input",
             "table-large": "Table",
             "chart-areaspline": "Graph",
-            "chart-pie": "Chart",  # chart-arc
+            "chart-pie": "Chart",
             "book-open-variant": "Sum",
         }
         for icon_name in icons_item_menu_lines.keys():
@@ -596,23 +577,9 @@ class MortgageCalculator(MDApp):
         #         )
         #     )
 
-        # for tab_act in self.root.ids.tabs.get_tab_list():
-        #     print(tab_act.text)
-        #     if tab_act.text.find("Active") != -1:
-        #         tab_act.text = "* ACTIVE *"
-        #         # tab_act.add_widget(
-        #         #     MDLabel(
-        #         #         text="TEST OK!",
-        #         #         halign="right",
-        #         #     )
-        #         # )
-
-        # print(self.root.ids.tabs.get_tab_list())
-
         pass
 
     def on_tab_switch(self, *args):
-        # def on_tab_switch(self, instance_tabs, instance_tab, instance_tabs_label, tab_text):
         '''Called when switching tabs.
 
                 :type instance_tabs: <kivymd.uix.tab.MDTabs object>;
@@ -620,159 +587,7 @@ class MortgageCalculator(MDApp):
                 :param instance_tab_label: <kivymd.uix.tab.MDTabsLabel object>;
                 :param tab_text: text or name icon of tab;
                 '''
-        # print(instance_tab.name + " : " + tab_text)
         self.current_tab = args[1].name
-        # print(args)
-        # print("tab clicked!" + instance_tab.ids.label.text)
-        ############# instance_tab.ids.label.text = tab_text
-        # print(instance_tab.ids.label.text)
         pass
-
-    def on_star_click(self):
-        if self.lang == 'en':
-            self.lang = 'ru'
-        elif self.lang == 'ru':
-            self.lang = 'en'
-        print(self.current_tab)
-        self.screen.ids.tabs.switch_tab(self.current_tab)
-        self.calc_table(self)
-        self.update_menu()
-        pass
-
-    def calc_table(self, *args):
-        print("button1 pressed")
-        start_date = self.screen.ids.start_date.text
-        loan = self.screen.ids.loan.text
-        months = self.screen.ids.months.text
-        interest = self.screen.ids.interest.text
-        payment_type = self.screen.ids.payment_type.text
-        print(start_date + " " + loan + " " + months + " " + interest + " " + payment_type)
-        # convert to date object, float, and so on
-        start_date = datetime.datetime.strptime(self.screen.ids.start_date.text, "%d-%m-%Y").date()
-        loan = float(loan)
-        months = int(months)
-        interest = float(interest)
-
-        row_data_for_tab = []
-        # annuity payment
-        # https://temabiz.com/finterminy/ap-formula-i-raschet-annuitetnogo-platezha.html
-        percent = interest / 100 / 12
-
-        next_date = start_date
-        next_prev_date = next_date
-
-        min_monthly_payment = 0
-        max_monthly_payment = 0
-
-        if self.payment_annuity:
-            monthly_payment = loan * (percent + percent / ((1 + percent) ** months - 1))
-            # print(monthly_payment)
-            debt_end_month = loan
-            for i in range(0, months):
-                repayment_of_interest = debt_end_month * percent
-                repayment_of_loan_body = monthly_payment - repayment_of_interest
-                debt_end_month = debt_end_month - repayment_of_loan_body
-                # print(monthly_payment, repayment_of_interest, repayment_of_loan_body, debt_end_month)
-                row_data_for_tab.append(
-                    [i + 1, next_date.strftime("%d-%m-%Y"), round(monthly_payment, 2), round(repayment_of_interest, 2),
-                     round(repayment_of_loan_body, 2), round(debt_end_month, 2)])
-                next_prev_date = next_date
-                next_date = next_month_date(next_date)
-            total_amount_of_payments = monthly_payment * months
-            overpayment_loan = total_amount_of_payments - loan
-            effective_interest_rate = ((total_amount_of_payments / loan - 1) / (months / 12)) * 100
-            # print(total_amount_of_payments, overpayment_loan, effective_interest_rate)
-        else:
-            repayment_of_interest = loan * percent
-            repayment_of_loan_body = loan / months
-            max_monthly_payment = repayment_of_interest + repayment_of_loan_body
-            # print(monthly_payment)
-            total_amount_of_payments = 0
-            overpayment_loan = 0
-            debt_end_month = loan
-            for i in range(0, months):
-                repayment_of_interest = debt_end_month * percent
-                debt_end_month = debt_end_month - repayment_of_loan_body
-                monthly_payment = repayment_of_interest + repayment_of_loan_body
-                total_amount_of_payments += monthly_payment
-                overpayment_loan += repayment_of_interest
-                # print(monthly_payment, repayment_of_interest, repayment_of_loan_body, debt_end_month)
-                row_data_for_tab.append(
-                    [i + 1, next_date.strftime("%d-%m-%Y"), round(monthly_payment, 2), round(repayment_of_interest, 2),
-                     round(repayment_of_loan_body, 2), round(debt_end_month, 2)])
-                next_prev_date = next_date
-                next_date = next_month_date(next_date)
-            min_monthly_payment = monthly_payment
-
-            effective_interest_rate = ((total_amount_of_payments / loan - 1) / (months / 12)) * 100
-            # print(total_amount_of_payments, overpayment_loan, effective_interest_rate)
-
-        # show_canvas_stress(self.screen.ids.graph)
-        show_canvas_stress(self.screen.ids.chart)
-
-        # tab3
-        self.screen.ids.graph.canvas.clear()
-        draw_graph(self.screen.ids.graph, start_date, loan, months, interest, payment_type)
-
-        # tab4
-        self.screen.ids.chart.canvas.clear()
-        draw_chart(self.screen.ids.chart, total_amount_of_payments, loan)
-
-        # tab2
-        # https://kivymd.readthedocs.io/en/latest/components/datatables/?highlight=datatable
-        self.data_tables = MDDataTable(
-            use_pagination=True,
-            pagination_menu_pos='center',
-            rows_num=10,
-            column_data=[
-                ("№", dp(10)),
-                ('Date', dp(20)),
-                ('Payment', dp(20)),
-                ('Interest', dp(20)),
-                ('Principal', dp(20)),
-                ('Debt', dp(20)),
-            ],
-            row_data=row_data_for_tab,
-        )
-        self.screen.ids.calc_data_table.clear_widgets()
-        self.screen.ids.calc_data_table.add_widget(self.data_tables)
-
-        # tab5
-        if self.payment_annuity:
-            self.screen.ids.sum_payment_label.text = str(round(monthly_payment, 2))
-        else:
-            self.screen.ids.sum_payment_label.text = str(round(min_monthly_payment, 2)) + " ... " + str(round(max_monthly_payment, 2))
-
-        self.screen.ids.sum_total_amount_of_payments_label.text = str(round(total_amount_of_payments, 2))
-        self.screen.ids.sum_overpayment_loan_label.text = str(round(overpayment_loan, 2))
-        self.screen.ids.sum_effective_interest_rate_label.text = str(round(effective_interest_rate, 2))
-
-        self.screen.ids.sum_term_length_label.text = str(round(months, 2)) + " months"
-        self.screen.ids.sum_interest_label.text = str(round(interest, 2)) + " %"
-        self.screen.ids.sum_property_value_label.text = str(round(loan, 2))
-
-        self.screen.ids.sum_start_date_label.text = start_date.strftime("%d-%m-%Y")
-        self.screen.ids.sum_end_date_label.text = next_prev_date.strftime("%d-%m-%Y")
-
-        self.screen.ids.sum_payments_type_label.text = payment_type
-
-        pass
-
-    def show_confirmation_dialog(self):
-        if not self.dialog:
-            self.dialog = MDDialog(
-                title="Share it:",
-                type="custom",
-                content_cls=ContentDialogSend(),
-                buttons=[
-                    MDFlatButton(
-                        text="CANCEL", text_color=self.theme_cls.primary_color
-                    ),
-                    MDFlatButton(
-                        text="SEND", text_color=self.theme_cls.primary_color
-                    ),
-                ],
-            )
-        self.dialog.open()
 
 MortgageCalculator().run()
