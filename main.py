@@ -505,12 +505,23 @@ class MortgageCalculator(MDApp):
         return self.screen
 
     def calc_1st_screen(self):
-        loan = self.screen.ids.loan.text
-        months = self.screen.ids.months.text
-        interest = self.screen.ids.interest.text
-        loan = float(loan)
-        months = int(months)
-        interest = float(interest)
+        if float(self.screen.ids.loan.text) < 1:
+            loan = 1.0
+            self.screen.ids.loan.text = '1'
+        else:
+            loan = float(self.screen.ids.loan.text)
+
+        if int(self.screen.ids.months.text) < 1:
+            months = 1
+            self.screen.ids.months.text = '1'
+        else:
+            months = int(self.screen.ids.months.text)
+        
+        if float(self.screen.ids.interest.text) < 1:
+            interest = 1
+            self.screen.ids.interest.text = '1'
+        else:
+            interest = float(self.screen.ids.interest.text)
         percent = interest / 100 / 12
 
         if self.payment_annuity:
